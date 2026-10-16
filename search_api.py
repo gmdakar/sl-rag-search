@@ -25,15 +25,18 @@ load_dotenv()
 
 PINECONE_API_KEY = os.getenv("PINECONE_API_KEY", "")
 PINECONE_INDEX = os.getenv("PINECONE_INDEX", "sl-rag-athletes")
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "paraphrase-multilingual-MiniLM-L12-v2")
+EMBEDDING_MODEL = os.getenv(
+    "EMBEDDING_MODEL",
+    "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+)
 API_SECRET = os.getenv("API_SECRET", "")
 NAMESPACE = os.getenv("PINECONE_NAMESPACE", "")
 NAMES_INDEX_FILE = Path(__file__).resolve().parent / "names_index.json"
 
-FUZZY_RATIO_MIN = float(os.getenv("NAME_FUZZY_RATIO", "0.82"))
+FUZZY_RATIO_MIN = float(os.getenv("NAME_FUZZY_RATIO", "0.78"))
 TOKEN_MIN_LEN = int(os.getenv("NAME_TOKEN_MIN_LEN", "3"))
 
-app = FastAPI(title="SL RAG Hybrid Search", version="1.2.0")
+app = FastAPI(title="SL RAG Hybrid Search", version="1.3.0-fastembed")
 
 _model = None
 _index = None
@@ -54,6 +57,28 @@ def significant_tokens(norm: str) -> list[str]:
     return [t for t in norm.split() if len(t) >= TOKEN_MIN_LEN]
 
 
+def edit_distance(a: str, b: str) -> int:
+    """Distance de Levenshtein (petites chaînes : noms de lutteurs)."""
+    if a == b:
+        return 0
+    if not a:
+        return len(b)
+    if not b:
+        return len(a)
+    if abs(len(a) - len(b)) > 2:
+        return 99
+    prev = list(range(len(b) + 1))
+    for i, ca in enumerate(a, 1):
+        cur = [i]
+        for j, cb in enumerate(b, 1):
+            ins = cur[j - 1] + 1
+            delete = prev[j] + 1
+            sub = prev[j - 1] + (0 if ca == cb else 1)
+            cur.append(min(ins, delete, sub))
+        prev = cur
+    return prev[-1]
+
+
 def load_names_index() -> dict[str, list[dict]]:
     if not NAMES_INDEX_FILE.exists():
         return {}
@@ -64,11 +89,22 @@ def load_names_index() -> dict[str, list[dict]]:
 
 
 def get_model():
+    """Charge fastembed (léger, sans torch CUDA) — même modèle 384-d que l'ingestion."""
     global _model
     if _model is None:
-        from sentence_transformers import SentenceTransformer
-        _model = SentenceTransformer(EMBEDDING_MODEL)
+        from fastembed import TextEmbedding
+        # Même famille que sentence-transformers paraphrase-multilingual-MiniLM-L12-v2
+        _model = TextEmbedding(model_name=EMBEDDING_MODEL)
+        print(f"fastembed chargé : {EMBEDDING_MODEL}")
     return _model
+
+
+def embed_query(query: str) -> list[float]:
+    model = get_model()
+    vec = next(model.embed([query]))
+    if hasattr(vec, "tolist"):
+        return vec.tolist()
+    return [float(x) for x in vec]
 
 
 def get_index():
@@ -154,6 +190,30 @@ def find_name_matches(query: str) -> list[dict]:
             _add_match(results, matched_ids, item, 0.95, "tokens")
             continue
 
+        # Tokens avec 1 faute max chacun (ex. "modu lo" → "modou lo")
+        if len(tokens) >= 2 and len(tokens) <= 4:
+            q_tok_list = significant_tokens(q)
+            if len(q_tok_list) >= len(tokens):
+                used = [False] * len(q_tok_list)
+                ok = True
+                for nt in tokens:
+                    found = False
+                    for qi, qt in enumerate(q_tok_list):
+                        if used[qi]:
+                            continue
+                        if abs(len(nt) - len(qt)) > 1:
+                            continue
+                        if edit_distance(nt, qt) <= 1:
+                            used[qi] = True
+                            found = True
+                            break
+                    if not found:
+                        ok = False
+                        break
+                if ok:
+                    _add_match(results, matched_ids, item, 0.94, "tokens_edit1")
+                    continue
+
         if len(tokens) == 1 and len(tokens[0]) >= 5:
             if re.search(rf"(?:^|\s){re.escape(tokens[0])}(?:\s|$)", q):
                 _add_match(results, matched_ids, item, 0.9, "token_single")
@@ -163,6 +223,35 @@ def find_name_matches(query: str) -> list[dict]:
         if len(c) >= 6 and c in q_compact:
             _add_match(results, matched_ids, item, 0.92, "compact")
             continue
+
+    # Distance d'édition ≤ 1 sur tokens isolés (Frank/Franc, Modou/Modu, etc.)
+    q_words = q.split()
+    for qw in q_words:
+        if len(qw) < 4:
+            continue
+        for norm, item in _names_flat:
+            iid = item.get("id")
+            if not iid or iid in matched_ids:
+                continue
+            # Nom mono-token ou dernier token discriminant
+            name_tokens = significant_tokens(norm)
+            candidates = []
+            if len(name_tokens) == 1:
+                candidates.append(name_tokens[0])
+            elif len(name_tokens) >= 2:
+                # Comparer aussi le nom complet normalisé si même nombre de mots
+                if len(norm.split()) == 1:
+                    candidates.append(norm)
+                # Dernier token souvent le nom de famille / ring name
+                candidates.append(name_tokens[-1])
+            for cand in candidates:
+                if abs(len(qw) - len(cand)) > 1:
+                    continue
+                d = edit_distance(qw, cand)
+                if d <= 1:
+                    score = 0.93 if d == 0 else 0.88
+                    _add_match(results, matched_ids, item, score, "edit1")
+                    break
 
     q_words = q.split()
     windows = []
@@ -247,6 +336,7 @@ def health():
         "names_index_size": len(_names_index),
         "names_flat_size": len(_names_flat),
         "fuzzy_ratio_min": FUZZY_RATIO_MIN,
+        "backend": "fastembed",
     }
 
 
@@ -269,9 +359,8 @@ def search(body: SearchRequest, authorization: Optional[str] = Header(default=No
         name_hits.append(h)
     seen_ids = {h["id"] for h in name_hits}
 
-    model = get_model()
     index = get_index()
-    vector = model.encode([query], normalize_embeddings=True)[0].tolist()
+    vector = embed_query(query)
     ns = body.namespace if body.namespace is not None else NAMESPACE
 
     result = index.query(
