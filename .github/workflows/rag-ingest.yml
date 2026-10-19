@@ -63,7 +63,7 @@ jobs:
             -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}" \
             "cd ${DRUPAL_ROOT} && mkdir -p private && \
-             www/vendor/drush/drush/drush sl-rag:export-entities --output=private/all_athletes.jsonl -y && \
+             /home/fwrjwxygfy/public_html/vendor/bin/drush sl-rag:export-entities --output=private/all_athletes.jsonl -y && \
              ls -la private/all_athletes.jsonl && \
              wc -l private/all_athletes.jsonl"
 
