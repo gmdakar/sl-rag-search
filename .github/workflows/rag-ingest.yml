@@ -1,4 +1,4 @@
-name: RAG ingest (prod to Pinecone)
+name: RAG ingest (prod to Pinecone)[cite: 7]
 
 on:
   workflow_dispatch:
@@ -22,7 +22,6 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
       DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
-      # Fichier JSONL hors docroot (pas sous web/)
       REMOTE_JSONL: /home/fwrjwxygfy/private_rag/all_athletes.jsonl
 
     steps:
@@ -66,7 +65,13 @@ jobs:
             "${SSH_USER}@${SSH_HOST}" \
             "mkdir -p /home/fwrjwxygfy/private_rag && \
              cd ${DRUPAL_ROOT} && \
-             /home/fwrjwxygfy/vendor/bin/drush sl-rag:export-entities --output=${REMOTE_JSONL} -y && \
+             if [ -f ./vendor/bin/drush ]; then \
+               ./vendor/bin/drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
+             elif [ -f ../vendor/bin/drush ]; then \
+               ../vendor/bin/drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
+             else \
+               drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
+             fi && \
              ls -la ${REMOTE_JSONL} && \
              wc -l ${REMOTE_JSONL}"
 
