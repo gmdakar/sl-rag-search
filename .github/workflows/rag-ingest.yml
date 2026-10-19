@@ -33,7 +33,7 @@ jobs:
 
       - name: Download JSONL
         run: |
-          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+          scp -P 5022 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DRUPAL_ROOT }}/private/all_athletes.jsonl" \
             ./all_athletes.jsonl
           wc -l all_athletes.jsonl
