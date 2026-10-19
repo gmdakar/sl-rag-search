@@ -1,4 +1,4 @@
-name: RAG ingest (prod → Pinecone)
+name: RAG ingest (prod → Pinecone)[cite: 1]
 
 on:
   workflow_dispatch:
@@ -23,7 +23,7 @@ jobs:
 
       - name: Export entities on PlanetHoster
         run: |
-          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+          ssh -p ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
             "cd ${{ secrets.DRUPAL_ROOT }} && \
              mkdir -p private && \
@@ -33,7 +33,7 @@ jobs:
 
       - name: Download JSONL
         run: |
-          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
             "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DRUPAL_ROOT }}/private/all_athletes.jsonl" \
             ./all_athletes.jsonl
           wc -l all_athletes.jsonl
