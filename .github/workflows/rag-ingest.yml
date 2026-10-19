@@ -1,9 +1,9 @@
-name: RAG ingest (prod → Pinecone)[cite: 1]
+name: RAG ingest (prod to Pinecone)
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: "0 4 * * *"
 
 jobs:
   ingest:
@@ -14,35 +14,63 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup SSH
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Check secrets
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
+        run: |
+          missing=0
+          [ -z "$SSH_PORT" ] && echo "MANQUANT: SSH_PORT" && missing=1
+          [ -z "$SSH_HOST" ] && echo "MANQUANT: SSH_HOST" && missing=1
+          [ -z "$SSH_USER" ] && echo "MANQUANT: SSH_USER" && missing=1
+          [ -z "$DRUPAL_ROOT" ] && echo "MANQUANT: DRUPAL_ROOT" && missing=1
+          [ -z "$PINECONE_API_KEY" ] && echo "MANQUANT: PINECONE_API_KEY" && missing=1
+          [ -z "$PINECONE_INDEX" ] && echo "MANQUANT: PINECONE_INDEX" && missing=1
+          if [ ! -s ~/.ssh/id_rsa ]; then echo "MANQUANT: SSH_PRIVATE_KEY"; missing=1; fi
+          if [ "$missing" = "1" ]; then exit 1; fi
+          echo "Secrets OK (port=$SSH_PORT host=$SSH_HOST user=$SSH_USER)"
 
       - name: Export entities on PlanetHoster
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
         run: |
-          ssh -p 5022 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
-            "cd ${{ secrets.DRUPAL_ROOT }} && \
-             mkdir -p private && \
+          ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            "${SSH_USER}@${SSH_HOST}" \
+            "cd ${DRUPAL_ROOT} && mkdir -p private && \
              ./vendor/bin/drush sl-rag:export-entities --output=private/all_athletes.jsonl -y && \
              ls -la private/all_athletes.jsonl && \
              wc -l private/all_athletes.jsonl"
 
       - name: Download JSONL
+        env:
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
         run: |
-          scp -P 5022 -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
-            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DRUPAL_ROOT }}/private/all_athletes.jsonl" \
+          scp -P "$SSH_PORT" -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            "${SSH_USER}@${SSH_HOST}:${DRUPAL_ROOT}/private/all_athletes.jsonl" \
             ./all_athletes.jsonl
           wc -l all_athletes.jsonl
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
-          cache: 'pip'
+          python-version: "3.12"
+          cache: pip
           cache-dependency-path: requirements-ingest.txt
 
       - name: Install deps
