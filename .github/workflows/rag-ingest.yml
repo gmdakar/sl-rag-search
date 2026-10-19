@@ -5,29 +5,33 @@ on:
   schedule:
     - cron: "0 4 * * *"
 
+permissions:
+  contents: write
+
+concurrency:
+  group: rag-ingest
+  cancel-in-progress: false
+
 jobs:
   ingest:
     runs-on: ubuntu-latest
     timeout-minutes: 180
 
+    env:
+      SSH_PORT: ${{ secrets.SSH_PORT }}
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup SSH key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
       - name: Check secrets
         env:
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
           PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
           PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
           missing=0
           [ -z "$SSH_PORT" ] && echo "MANQUANT: SSH_PORT" && missing=1
@@ -36,18 +40,27 @@ jobs:
           [ -z "$DRUPAL_ROOT" ] && echo "MANQUANT: DRUPAL_ROOT" && missing=1
           [ -z "$PINECONE_API_KEY" ] && echo "MANQUANT: PINECONE_API_KEY" && missing=1
           [ -z "$PINECONE_INDEX" ] && echo "MANQUANT: PINECONE_INDEX" && missing=1
-          if [ ! -s ~/.ssh/id_rsa ]; then echo "MANQUANT: SSH_PRIVATE_KEY"; missing=1; fi
+          [ -z "$SSH_PRIVATE_KEY" ] && echo "MANQUANT: SSH_PRIVATE_KEY" && missing=1
+          if [ -n "$SSH_PORT" ] && ! [[ "$SSH_PORT" =~ ^[0-9]+$ ]]; then
+            echo "SSH_PORT invalide (espace ou retour a la ligne ?)"
+            missing=1
+          fi
           if [ "$missing" = "1" ]; then exit 1; fi
-          echo "Secrets OK (port=$SSH_PORT host=$SSH_HOST user=$SSH_USER)"
+          echo "Secrets OK (host=$SSH_HOST user=$SSH_USER)"
+
+      - name: Setup SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
 
       - name: Export entities on PlanetHoster
-        env:
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
         run: |
-          ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+          echo "Connexion SSH sur le port $SSH_PORT"
+          ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}" \
             "cd ${DRUPAL_ROOT} && mkdir -p private && \
              ./vendor/bin/drush sl-rag:export-entities --output=private/all_athletes.jsonl -y && \
@@ -55,13 +68,9 @@ jobs:
              wc -l private/all_athletes.jsonl"
 
       - name: Download JSONL
-        env:
-          SSH_PORT: ${{ secrets.SSH_PORT }}
-          SSH_HOST: ${{ secrets.SSH_HOST }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
         run: |
-          scp -P "$SSH_PORT" -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+          scp -P "$SSH_PORT" -i ~/.ssh/id_rsa \
+            -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}:${DRUPAL_ROOT}/private/all_athletes.jsonl" \
             ./all_athletes.jsonl
           wc -l all_athletes.jsonl
