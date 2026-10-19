@@ -1,4 +1,4 @@
-name: RAG ingest (prod to Pinecone)[cite: 7]
+name: RAG ingest (prod to Pinecone)
 
 on:
   workflow_dispatch:
@@ -21,8 +21,10 @@ jobs:
       SSH_PORT: ${{ secrets.SSH_PORT }}
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
-      DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
+      # Chemins absolus PlanetHoster (hors web/)
+      REMOTE_DRUSH: /home/fwrjwxygfy/public_html/vendor/bin/drush
       REMOTE_JSONL: /home/fwrjwxygfy/private_rag/all_athletes.jsonl
+      REMOTE_RAG_DIR: /home/fwrjwxygfy/private_rag
 
     steps:
       - name: Checkout
@@ -38,7 +40,6 @@ jobs:
           [ -z "$SSH_PORT" ] && echo "MANQUANT: SSH_PORT" && missing=1
           [ -z "$SSH_HOST" ] && echo "MANQUANT: SSH_HOST" && missing=1
           [ -z "$SSH_USER" ] && echo "MANQUANT: SSH_USER" && missing=1
-          [ -z "$DRUPAL_ROOT" ] && echo "MANQUANT: DRUPAL_ROOT" && missing=1
           [ -z "$PINECONE_API_KEY" ] && echo "MANQUANT: PINECONE_API_KEY" && missing=1
           [ -z "$PINECONE_INDEX" ] && echo "MANQUANT: PINECONE_INDEX" && missing=1
           [ -z "$SSH_PRIVATE_KEY" ] && echo "MANQUANT: SSH_PRIVATE_KEY" && missing=1
@@ -47,7 +48,7 @@ jobs:
             missing=1
           fi
           if [ "$missing" = "1" ]; then exit 1; fi
-          echo "Secrets OK (host=$SSH_HOST user=$SSH_USER root=$DRUPAL_ROOT)"
+          echo "Secrets OK (host=$SSH_HOST user=$SSH_USER)"
 
       - name: Setup SSH
         env:
@@ -59,19 +60,12 @@ jobs:
 
       - name: Export entities on PlanetHoster
         run: |
-          echo "Connexion SSH port=$SSH_PORT → export vers $REMOTE_JSONL"
+          echo "SSH port=$SSH_PORT → $REMOTE_JSONL"
           ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}" \
-            "mkdir -p /home/fwrjwxygfy/private_rag && \
-             cd ${DRUPAL_ROOT} && \
-             if [ -f ./vendor/bin/drush ]; then \
-               ./vendor/bin/drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
-             elif [ -f ../vendor/bin/drush ]; then \
-               ../vendor/bin/drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
-             else \
-               drush sl-rag:export-entities --output=${REMOTE_JSONL} -y; \
-             fi && \
+            "mkdir -p ${REMOTE_RAG_DIR} && \
+             ${REMOTE_DRUSH} sl-rag:export-entities --output=${REMOTE_JSONL} -y && \
              ls -la ${REMOTE_JSONL} && \
              wc -l ${REMOTE_JSONL}"
 
