@@ -1,4 +1,4 @@
-name: RAG ingest (prod to Pinecone)[cite: 3]
+name: RAG ingest (prod to Pinecone)
 
 on:
   workflow_dispatch:
@@ -22,6 +22,8 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
       DRUPAL_ROOT: ${{ secrets.DRUPAL_ROOT }}
+      # Fichier JSONL hors docroot (pas sous web/)
+      REMOTE_JSONL: /home/fwrjwxygfy/private_rag/all_athletes.jsonl
 
     steps:
       - name: Checkout
@@ -46,7 +48,7 @@ jobs:
             missing=1
           fi
           if [ "$missing" = "1" ]; then exit 1; fi
-          echo "Secrets OK (host=$SSH_HOST user=$SSH_USER)"
+          echo "Secrets OK (host=$SSH_HOST user=$SSH_USER root=$DRUPAL_ROOT)"
 
       - name: Setup SSH
         env:
@@ -56,10 +58,9 @@ jobs:
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Export all entities on PlanetHoster
+      - name: Export entities on PlanetHoster
         run: |
-          echo "Connexion SSH sur le port $SSH_PORT"
-          REMOTE_JSONL="/home/fwrjwxygfy/private_rag/all_athletes.jsonl"
+          echo "Connexion SSH port=$SSH_PORT → export vers $REMOTE_JSONL"
           ssh -p "$SSH_PORT" -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}" \
@@ -71,11 +72,11 @@ jobs:
 
       - name: Download JSONL
         run: |
-          REMOTE_JSONL="/home/fwrjwxygfy/private_rag/all_athletes.jsonl"
           scp -P "$SSH_PORT" -i ~/.ssh/id_rsa \
             -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=20 \
             "${SSH_USER}@${SSH_HOST}:${REMOTE_JSONL}" \
             ./all_athletes.jsonl
+          ls -la all_athletes.jsonl
           wc -l all_athletes.jsonl
 
       - name: Setup Python
