@@ -1,0 +1,65 @@
+name: RAG ingest (prod → Pinecone)
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H "${{ secrets.SSH_HOST }}" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+      - name: Export entities on PlanetHoster
+        run: |
+          ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}" \
+            "cd ${{ secrets.DRUPAL_ROOT }} && \
+             mkdir -p private && \
+             ./vendor/bin/drush sl-rag:export-entities --output=private/all_athletes.jsonl -y && \
+             ls -la private/all_athletes.jsonl && \
+             wc -l private/all_athletes.jsonl"
+
+      - name: Download JSONL
+        run: |
+          scp -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no \
+            "${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:${{ secrets.DRUPAL_ROOT }}/private/all_athletes.jsonl" \
+            ./all_athletes.jsonl
+          wc -l all_athletes.jsonl
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements-ingest.txt
+
+      - name: Install deps
+        run: pip install -r requirements-ingest.txt
+
+      - name: Ingest to Pinecone
+        env:
+          PINECONE_API_KEY: ${{ secrets.PINECONE_API_KEY }}
+          PINECONE_INDEX: ${{ secrets.PINECONE_INDEX }}
+        run: |
+          python ingest.py --file all_athletes.jsonl
+          python ingest.py --file all_athletes.jsonl --names-only
+
+      - name: Commit names_index if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add names_index.json
+          git diff --staged --quiet || git commit -m "chore: refresh names_index from prod export"
+          git push
