@@ -56,7 +56,7 @@ jobs:
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
 
-      - name: Export entities on PlanetHoster
+      - name: Export all entities on PlanetHoster
         run: |
           echo "Connexion SSH sur le port $SSH_PORT"
           REMOTE_JSONL="/home/fwrjwxygfy/private_rag/all_athletes.jsonl"
