@@ -1,0 +1,5 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+sentence-transformers>=3.0.0
+pinecone>=5.0.0
+python-dotenv>=1.0.0
