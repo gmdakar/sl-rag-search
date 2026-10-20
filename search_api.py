@@ -54,7 +54,16 @@ def normalize_name(name: str) -> str:
 
 
 def significant_tokens(norm: str) -> list[str]:
-    return [t for t in norm.split() if len(t) >= TOKEN_MIN_LEN]
+    """Tokens utiles : longueur >= TOKEN_MIN_LEN, ou chiffres (ex. '2' dans Boy Niang 2)."""
+    out = []
+    for t in norm.split():
+        if t.isdigit() or len(t) >= TOKEN_MIN_LEN:
+            out.append(t)
+    return out
+
+
+def name_digits(norm: str) -> set[str]:
+    return {t for t in norm.split() if t.isdigit()}
 
 
 def edit_distance(a: str, b: str) -> int:
@@ -160,7 +169,11 @@ def _add_match(results, matched_ids, item, score, how):
 
 
 def find_name_matches(query: str) -> list[dict]:
-    """Matching générique : exact, substring, tokens, compact, fuzzy."""
+    """Matching générique strict :
+    - exact / substring / tokens d'abord
+    - les chiffres du nom (ex. 2) doivent être dans la question
+    - fuzzy seulement si assez de tokens en commun
+    """
     if not _names_flat:
         return []
 
@@ -169,12 +182,24 @@ def find_name_matches(query: str) -> list[dict]:
         return []
     q_compact = q.replace(" ", "")
     q_tokens = set(significant_tokens(q))
+    q_tok_list = significant_tokens(q)
+    q_digits = name_digits(q)
 
     results: list[dict] = []
     matched_ids: set[str] = set()
 
+    def digits_ok(norm: str) -> bool:
+        """Si le nom porte un numéro (2, 3…), la question doit le contenir."""
+        nd = name_digits(norm)
+        if not nd:
+            return True
+        return nd.issubset(q_digits) or all(d in q for d in nd)
+
+    # --- Pass 1 : exact, substring, tokens (haute confiance) ---
     for norm, item in _names_flat:
         if len(norm) < 2:
+            continue
+        if not digits_ok(norm):
             continue
 
         if re.search(rf"(?:^|\s){re.escape(norm)}(?:\s|$)", q):
@@ -186,13 +211,13 @@ def find_name_matches(query: str) -> list[dict]:
             _add_match(results, matched_ids, item, 0.98, "substring")
             continue
 
+        # Tous les tokens du nom dans la question (y compris chiffres)
         if len(tokens) >= 2 and all(t in q_tokens for t in tokens):
             _add_match(results, matched_ids, item, 0.95, "tokens")
             continue
 
-        # Tokens avec 1 faute max chacun (ex. "modu lo" → "modou lo")
-        if len(tokens) >= 2 and len(tokens) <= 4:
-            q_tok_list = significant_tokens(q)
+        # Tokens avec 1 faute max (hors chiffres exacts)
+        if len(tokens) >= 2 and len(tokens) <= 5:
             if len(q_tok_list) >= len(tokens):
                 used = [False] * len(q_tok_list)
                 ok = True
@@ -200,6 +225,12 @@ def find_name_matches(query: str) -> list[dict]:
                     found = False
                     for qi, qt in enumerate(q_tok_list):
                         if used[qi]:
+                            continue
+                        if nt.isdigit() or qt.isdigit():
+                            if nt == qt:
+                                used[qi] = True
+                                found = True
+                                break
                             continue
                         if abs(len(nt) - len(qt)) > 1:
                             continue
@@ -214,58 +245,57 @@ def find_name_matches(query: str) -> list[dict]:
                     _add_match(results, matched_ids, item, 0.94, "tokens_edit1")
                     continue
 
-        if len(tokens) == 1 and len(tokens[0]) >= 5:
-            if re.search(rf"(?:^|\s){re.escape(tokens[0])}(?:\s|$)", q):
-                _add_match(results, matched_ids, item, 0.9, "token_single")
-                continue
+    high_conf = [r for r in results if r["name_score"] >= 0.94]
+    # Tokens déjà « couverts » par un match exact (évite Ama Bou Malika si General Malika match)
+    covered_tokens: set[str] = set()
+    for r in high_conf:
+        nom = normalize_name(str(r.get("nom") or ""))
+        covered_tokens.update(significant_tokens(nom))
 
-        c = norm.replace(" ", "")
-        if len(c) >= 6 and c in q_compact:
-            _add_match(results, matched_ids, item, 0.92, "compact")
-            continue
-
-    # Distance d'édition ≤ 1 sur tokens isolés (Frank/Franc, Modou/Modu, etc.)
-    q_words = q.split()
-    for qw in q_words:
-        if len(qw) < 4:
-            continue
-        for norm, item in _names_flat:
-            iid = item.get("id")
-            if not iid or iid in matched_ids:
-                continue
-            # Nom mono-token ou dernier token discriminant
-            name_tokens = significant_tokens(norm)
-            candidates = []
-            if len(name_tokens) == 1:
-                candidates.append(name_tokens[0])
-            elif len(name_tokens) >= 2:
-                # Comparer aussi le nom complet normalisé si même nombre de mots
-                if len(norm.split()) == 1:
-                    candidates.append(norm)
-                # Dernier token souvent le nom de famille / ring name
-                candidates.append(name_tokens[-1])
-            for cand in candidates:
-                if abs(len(qw) - len(cand)) > 1:
-                    continue
-                d = edit_distance(qw, cand)
-                if d <= 1:
-                    score = 0.93 if d == 0 else 0.88
-                    _add_match(results, matched_ids, item, score, "edit1")
-                    break
-
-    q_words = q.split()
-    windows = []
-    for n in range(1, 5):
-        for i in range(len(q_words) - n + 1):
-            windows.append(" ".join(q_words[i:i+n]))
-    windows = sorted(set(windows), key=len, reverse=True)
-
+    # --- Pass 2 : fuzzy / edit1 plus strict ---
     for norm, item in _names_flat:
         iid = item.get("id")
         if not iid or iid in matched_ids:
             continue
         if len(norm) < 4:
             continue
+        if not digits_ok(norm):
+            continue
+
+        name_toks = significant_tokens(norm)
+        if not name_toks:
+            continue
+
+        # Au moins la moitié des tokens du nom doivent matcher la question
+        overlap = 0
+        for nt in name_toks:
+            if nt in q_tokens:
+                overlap += 1
+                continue
+            if nt.isdigit():
+                continue
+            for qt in q_tok_list:
+                if qt.isdigit():
+                    continue
+                if abs(len(nt) - len(qt)) <= 1 and edit_distance(nt, qt) <= 1:
+                    overlap += 1
+                    break
+        if overlap < max(1, (len(name_toks) + 1) // 2):
+            continue
+
+        # Si un match exact a déjà pris tous les tokens discriminants, skip
+        if covered_tokens and name_toks:
+            # ex. "malika" seul déjà couvert par "general malika"
+            non_generic = [t for t in name_toks if t not in {"boy", "fils", "bou", "de", "le", "la"}]
+            if non_generic and all(t in covered_tokens for t in non_generic):
+                continue
+
+        # Fuzzy SequenceMatcher sur fenêtres
+        q_words = q.split()
+        windows = []
+        for n in range(1, min(5, len(q_words) + 1)):
+            for i in range(len(q_words) - n + 1):
+                windows.append(" ".join(q_words[i : i + n]))
         best = 0.0
         for w in windows:
             if abs(len(w) - len(norm)) > max(3, len(norm) // 2):
@@ -273,9 +303,9 @@ def find_name_matches(query: str) -> list[dict]:
             r = SequenceMatcher(None, w, norm).ratio()
             if r > best:
                 best = r
-                if best >= 0.97:
-                    break
-        if best >= FUZZY_RATIO_MIN:
+        # Seuil plus strict pour noms multi-mots
+        min_ratio = max(FUZZY_RATIO_MIN, 0.85 if len(name_toks) >= 2 else FUZZY_RATIO_MIN)
+        if best >= min_ratio:
             _add_match(results, matched_ids, item, best, "fuzzy")
 
     results.sort(key=lambda x: (-x["name_score"], -len(str(x.get("nom") or ""))))
