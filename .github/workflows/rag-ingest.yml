@@ -3,7 +3,7 @@ name: RAG ingest (prod to Pinecone)
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 4 * * *"
+    - cron: "1 2 * * *"
 
 permissions:
   contents: write
