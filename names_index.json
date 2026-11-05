@@ -4437,13 +4437,6 @@
 "drupal_id": 7866
 }
 ],
-"trema": [
-{
-"id": "athlete_7874",
-"nom": "Tréma",
-"drupal_id": 7874
-}
-],
 "john kara": [
 {
 "id": "athlete_7875",
@@ -4491,20 +4484,6 @@
 "id": "athlete_7878",
 "nom": "Boy Faye",
 "drupal_id": 7878
-}
-],
-"boy pambal": [
-{
-"id": "athlete_7880",
-"nom": "Boy Pambal",
-"drupal_id": 7880
-}
-],
-"boypambal": [
-{
-"id": "athlete_7880",
-"nom": "Boy Pambal",
-"drupal_id": 7880
 }
 ],
 "doudou khady": [
@@ -4561,20 +4540,6 @@
 "id": "athlete_7884",
 "nom": "Boy Kaïré 2",
 "drupal_id": 7884
-}
-],
-"domou saloum": [
-{
-"id": "athlete_7885",
-"nom": "Domou Saloum",
-"drupal_id": 7885
-}
-],
-"domousaloum": [
-{
-"id": "athlete_7885",
-"nom": "Domou Saloum",
-"drupal_id": 7885
 }
 ],
 "fourriere": [
@@ -4640,20 +4605,6 @@
 "drupal_id": 7890
 }
 ],
-"iles de serpent": [
-{
-"id": "athlete_7891",
-"nom": "Iles De Serpent",
-"drupal_id": 7891
-}
-],
-"ilesdeserpent": [
-{
-"id": "athlete_7891",
-"nom": "Iles De Serpent",
-"drupal_id": 7891
-}
-],
 "boy diobass": [
 {
 "id": "athlete_7893",
@@ -4694,20 +4645,6 @@
 "id": "athlete_7897",
 "nom": "Sen Koumpa",
 "drupal_id": 7897
-}
-],
-"ibou mecanicien": [
-{
-"id": "athlete_7898",
-"nom": "Ibou Mecanicien",
-"drupal_id": 7898
-}
-],
-"iboumecanicien": [
-{
-"id": "athlete_7898",
-"nom": "Ibou Mecanicien",
-"drupal_id": 7898
 }
 ],
 "domou diamaguene": [
@@ -19121,20 +19058,6 @@
 "drupal_id": 15292
 }
 ],
-"diop 2 2": [
-{
-"id": "athlete_15293",
-"nom": "Diop 2 2",
-"drupal_id": 15293
-}
-],
-"diop22": [
-{
-"id": "athlete_15293",
-"nom": "Diop 2 2",
-"drupal_id": 15293
-}
-],
 "big balla": [
 {
 "id": "athlete_15294",
@@ -32554,20 +32477,6 @@
 "drupal_id": 21670
 }
 ],
-"diop 2 yeumbeul marin": [
-{
-"id": "athlete_21681",
-"nom": "Diop 2 (yeumbeul Marin)",
-"drupal_id": 21681
-}
-],
-"diop2yeumbeulmarin": [
-{
-"id": "athlete_21681",
-"nom": "Diop 2 (yeumbeul Marin)",
-"drupal_id": 21681
-}
-],
 "dama bou ndaw": [
 {
 "id": "athlete_21685",
@@ -32937,20 +32846,6 @@
 "id": "athlete_21785",
 "nom": "Souleye Ndiaganiao",
 "drupal_id": 21785
-}
-],
-"diop 2": [
-{
-"id": "athlete_21789",
-"nom": "Diop 2",
-"drupal_id": 21789
-}
-],
-"diop2": [
-{
-"id": "athlete_21789",
-"nom": "Diop 2",
-"drupal_id": 21789
 }
 ],
 "boy dioume": [
