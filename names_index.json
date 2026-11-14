@@ -6313,34 +6313,6 @@
 "drupal_id": 8087
 }
 ],
-"ama 2": [
-{
-"id": "athlete_8088",
-"nom": "Ama 2",
-"drupal_id": 8088
-}
-],
-"ama2": [
-{
-"id": "athlete_8088",
-"nom": "Ama 2",
-"drupal_id": 8088
-}
-],
-"walo bagnena": [
-{
-"id": "athlete_8089",
-"nom": "Walo Bagnena",
-"drupal_id": 8089
-}
-],
-"walobagnena": [
-{
-"id": "athlete_8089",
-"nom": "Walo Bagnena",
-"drupal_id": 8089
-}
-],
 "mamaya": [
 {
 "id": "athlete_8091",
@@ -6395,13 +6367,6 @@
 "id": "athlete_8097",
 "nom": "Thiatou Eumeu",
 "drupal_id": 8097
-}
-],
-"medzo": [
-{
-"id": "athlete_8098",
-"nom": "Medzo",
-"drupal_id": 8098
 }
 ],
 "l enfant noir": [
@@ -33861,6 +33826,62 @@
 "id": "athlete_22132",
 "nom": "Bete Bete",
 "drupal_id": 22132
+}
+],
+"renou gouy": [
+{
+"id": "athlete_22136",
+"nom": "Renou Gouy",
+"drupal_id": 22136
+}
+],
+"renougouy": [
+{
+"id": "athlete_22136",
+"nom": "Renou Gouy",
+"drupal_id": 22136
+}
+],
+"pape demba": [
+{
+"id": "athlete_22139",
+"nom": "Pape Demba",
+"drupal_id": 22139
+}
+],
+"papedemba": [
+{
+"id": "athlete_22139",
+"nom": "Pape Demba",
+"drupal_id": 22139
+}
+],
+"mame birame sow": [
+{
+"id": "athlete_22143",
+"nom": "Mame Birame Sow",
+"drupal_id": 22143
+}
+],
+"mamebiramesow": [
+{
+"id": "athlete_22143",
+"nom": "Mame Birame Sow",
+"drupal_id": 22143
+}
+],
+"sa ngoundiane": [
+{
+"id": "athlete_22148",
+"nom": "Sa Ngoundiane",
+"drupal_id": 22148
+}
+],
+"sangoundiane": [
+{
+"id": "athlete_22148",
+"nom": "Sa Ngoundiane",
+"drupal_id": 22148
 }
 ]
 }
