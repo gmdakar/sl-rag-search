@@ -6964,20 +6964,6 @@
 "drupal_id": 8157
 }
 ],
-"lam toro": [
-{
-"id": "athlete_8158",
-"nom": "Lam Toro",
-"drupal_id": 8158
-}
-],
-"lamtoro": [
-{
-"id": "athlete_8158",
-"nom": "Lam Toro",
-"drupal_id": 8158
-}
-],
 "bolo bs": [
 {
 "id": "athlete_8159",
@@ -7006,27 +6992,6 @@
 "drupal_id": 8160
 }
 ],
-"lac junior": [
-{
-"id": "athlete_8161",
-"nom": "Lac Junior",
-"drupal_id": 8161
-}
-],
-"lacjunior": [
-{
-"id": "athlete_8161",
-"nom": "Lac Junior",
-"drupal_id": 8161
-}
-],
-"grenade": [
-{
-"id": "athlete_8162",
-"nom": "Grenade",
-"drupal_id": 8162
-}
-],
 "gris junior": [
 {
 "id": "athlete_8163",
@@ -7039,34 +7004,6 @@
 "id": "athlete_8163",
 "nom": "Gris Junior",
 "drupal_id": 8163
-}
-],
-"guitaghass": [
-{
-"id": "athlete_8164",
-"nom": "Guitaghass",
-"drupal_id": 8164
-}
-],
-"boy mont rolland": [
-{
-"id": "athlete_8165",
-"nom": "Boy Mont Rolland",
-"drupal_id": 8165
-}
-],
-"boymontrolland": [
-{
-"id": "athlete_8165",
-"nom": "Boy Mont Rolland",
-"drupal_id": 8165
-}
-],
-"chicory": [
-{
-"id": "athlete_8166",
-"nom": "Chicory",
-"drupal_id": 8166
 }
 ],
 "general tam": [
@@ -7109,34 +7046,6 @@
 "id": "athlete_8169",
 "nom": "Yawou Dial",
 "drupal_id": 8169
-}
-],
-"boy poulo": [
-{
-"id": "athlete_8171",
-"nom": "Boy Poulo",
-"drupal_id": 8171
-}
-],
-"boypoulo": [
-{
-"id": "athlete_8171",
-"nom": "Boy Poulo",
-"drupal_id": 8171
-}
-],
-"thiaat re": [
-{
-"id": "athlete_8172",
-"nom": "Thiaat Re",
-"drupal_id": 8172
-}
-],
-"thiaatre": [
-{
-"id": "athlete_8172",
-"nom": "Thiaat Re",
-"drupal_id": 8172
 }
 ],
 "tyson guinguineo": [
@@ -31903,13 +31812,6 @@
 "drupal_id": 21631
 }
 ],
-"thiek": [
-{
-"id": "athlete_21638",
-"nom": "Thiék",
-"drupal_id": 21638
-}
-],
 "pape djini sarr": [
 {
 "id": "athlete_21643",
@@ -33959,6 +33861,34 @@
 "id": "athlete_22201",
 "nom": "Diakhaté",
 "drupal_id": 22201
+}
+],
+"zale lo junior": [
+{
+"id": "athlete_22216",
+"nom": "Zale Lo Junior",
+"drupal_id": 22216
+}
+],
+"zalelojunior": [
+{
+"id": "athlete_22216",
+"nom": "Zale Lo Junior",
+"drupal_id": 22216
+}
+],
+"garga mbosse 2": [
+{
+"id": "athlete_22218",
+"nom": "Garga Mbossé 2",
+"drupal_id": 22218
+}
+],
+"gargambosse2": [
+{
+"id": "athlete_22218",
+"nom": "Garga Mbossé 2",
+"drupal_id": 22218
 }
 ]
 }
