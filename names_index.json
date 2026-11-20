@@ -7580,20 +7580,6 @@
 "drupal_id": 9234
 }
 ],
-"thiatou patar": [
-{
-"id": "athlete_9235",
-"nom": "Thiatou Patar",
-"drupal_id": 9235
-}
-],
-"thiatoupatar": [
-{
-"id": "athlete_9235",
-"nom": "Thiatou Patar",
-"drupal_id": 9235
-}
-],
 "sores": [
 {
 "id": "athlete_9238",
@@ -7662,20 +7648,6 @@
 "id": "athlete_9264",
 "nom": "Prince",
 "drupal_id": 9264
-}
-],
-"bira sene": [
-{
-"id": "athlete_9299",
-"nom": "Bira Sène",
-"drupal_id": 9299
-}
-],
-"birasene": [
-{
-"id": "athlete_9299",
-"nom": "Bira Sène",
-"drupal_id": 9299
 }
 ],
 "balla beye 2 baboye": [
@@ -7795,41 +7767,6 @@
 "id": "athlete_9956",
 "nom": "Guine Bou Yoff",
 "drupal_id": 9956
-}
-],
-"cheikh walo": [
-{
-"id": "athlete_9990",
-"nom": "Cheikh Walo",
-"drupal_id": 9990
-}
-],
-"cheikhwalo": [
-{
-"id": "athlete_9990",
-"nom": "Cheikh Walo",
-"drupal_id": 9990
-}
-],
-"torres": [
-{
-"id": "athlete_9994",
-"nom": "Torres",
-"drupal_id": 9994
-}
-],
-"far bou diaar": [
-{
-"id": "athlete_10000",
-"nom": "Far Bou Diaar",
-"drupal_id": 10000
-}
-],
-"farboudiaar": [
-{
-"id": "athlete_10000",
-"nom": "Far Bou Diaar",
-"drupal_id": 10000
 }
 ],
 "siteu bou ngor": [
