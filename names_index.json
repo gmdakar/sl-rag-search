@@ -27619,20 +27619,6 @@
 "drupal_id": 19975
 }
 ],
-"bebe pape mor lo": [
-{
-"id": "athlete_19979",
-"nom": "Bébé Pape Mor Lô",
-"drupal_id": 19979
-}
-],
-"bebepapemorlo": [
-{
-"id": "athlete_19979",
-"nom": "Bébé Pape Mor Lô",
-"drupal_id": 19979
-}
-],
 "sa khombol 2": [
 {
 "id": "athlete_19982",
@@ -33798,6 +33784,27 @@
 "id": "athlete_22256",
 "nom": "Général Bou Parcelle",
 "drupal_id": 22256
+}
+],
+"bentegne bou fass": [
+{
+"id": "athlete_22282",
+"nom": "Bentégné Bou Fass",
+"drupal_id": 22282
+}
+],
+"bentegneboufass": [
+{
+"id": "athlete_22282",
+"nom": "Bentégné Bou Fass",
+"drupal_id": 22282
+}
+],
+"becaye": [
+{
+"id": "athlete_22287",
+"nom": "Bécaye",
+"drupal_id": 22287
 }
 ]
 }
