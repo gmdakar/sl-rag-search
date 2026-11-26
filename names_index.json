@@ -8049,13 +8049,6 @@
 "drupal_id": 10221
 }
 ],
-"niakhoum": [
-{
-"id": "athlete_10237",
-"nom": "Niakhoum",
-"drupal_id": 10237
-}
-],
 "bebe bismi": [
 {
 "id": "athlete_10246",
@@ -9417,13 +9410,6 @@
 "id": "athlete_11092",
 "nom": "Boy Waranka",
 "drupal_id": 11092
-}
-],
-"safara": [
-{
-"id": "athlete_11093",
-"nom": "Safara",
-"drupal_id": 11093
 }
 ],
 "souleye gainde": [
@@ -12028,20 +12014,6 @@
 "id": "athlete_12269",
 "nom": "Matar Diouf",
 "drupal_id": 12269
-}
-],
-"ndiakhoume 2": [
-{
-"id": "athlete_12276",
-"nom": "Ndiakhoume 2",
-"drupal_id": 12276
-}
-],
-"ndiakhoume2": [
-{
-"id": "athlete_12276",
-"nom": "Ndiakhoume 2",
-"drupal_id": 12276
 }
 ],
 "tapha ndiane": [
@@ -33968,20 +33940,6 @@
 "drupal_id": 22360
 }
 ],
-"sa thies bou": [
-{
-"id": "athlete_22365",
-"nom": "Sa Thiès Bou",
-"drupal_id": 22365
-}
-],
-"sathiesbou": [
-{
-"id": "athlete_22365",
-"nom": "Sa Thiès Bou",
-"drupal_id": 22365
-}
-],
 "boy pikine": [
 {
 "id": "athlete_22367",
@@ -34078,6 +34036,34 @@
 "id": "athlete_22392",
 "nom": "Mahalay Joal",
 "drupal_id": 22392
+}
+],
+"mbadate ne sob diokoul": [
+{
+"id": "athlete_22398",
+"nom": "Mbadate Né Sob Diokoul",
+"drupal_id": 22398
+}
+],
+"mbadatenesobdiokoul": [
+{
+"id": "athlete_22398",
+"nom": "Mbadate Né Sob Diokoul",
+"drupal_id": 22398
+}
+],
+"diaz ndianda": [
+{
+"id": "athlete_22400",
+"nom": "Diaz Ndianda",
+"drupal_id": 22400
+}
+],
+"diazndianda": [
+{
+"id": "athlete_22400",
+"nom": "Diaz Ndianda",
+"drupal_id": 22400
 }
 ]
 }
