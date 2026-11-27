@@ -9482,34 +9482,6 @@
 "drupal_id": 11102
 }
 ],
-"kao bou": [
-{
-"id": "athlete_11104",
-"nom": "Kao Bou",
-"drupal_id": 11104
-}
-],
-"kaobou": [
-{
-"id": "athlete_11104",
-"nom": "Kao Bou",
-"drupal_id": 11104
-}
-],
-"general bou": [
-{
-"id": "athlete_11107",
-"nom": "General Bou",
-"drupal_id": 11107
-}
-],
-"generalbou": [
-{
-"id": "athlete_11107",
-"nom": "General Bou",
-"drupal_id": 11107
-}
-],
 "mor degager": [
 {
 "id": "athlete_11119",
@@ -9592,20 +9564,6 @@
 "id": "athlete_11154",
 "nom": "Babou Sarr",
 "drupal_id": 11154
-}
-],
-"babacar khouma": [
-{
-"id": "athlete_11155",
-"nom": "Babacar Khouma",
-"drupal_id": 11155
-}
-],
-"babacarkhouma": [
-{
-"id": "athlete_11155",
-"nom": "Babacar Khouma",
-"drupal_id": 11155
 }
 ],
 "peureuse": [
