@@ -9601,48 +9601,6 @@
 "drupal_id": 11160
 }
 ],
-"bross el bandi 2": [
-{
-"id": "athlete_11161",
-"nom": "Bross El Bandi 2",
-"drupal_id": 11161
-}
-],
-"brosselbandi2": [
-{
-"id": "athlete_11161",
-"nom": "Bross El Bandi 2",
-"drupal_id": 11161
-}
-],
-"petit niakhar": [
-{
-"id": "athlete_11162",
-"nom": "Petit Niakhar",
-"drupal_id": 11162
-}
-],
-"petitniakhar": [
-{
-"id": "athlete_11162",
-"nom": "Petit Niakhar",
-"drupal_id": 11162
-}
-],
-"boye malika": [
-{
-"id": "athlete_11163",
-"nom": "Boye Malika",
-"drupal_id": 11163
-}
-],
-"boyemalika": [
-{
-"id": "athlete_11163",
-"nom": "Boye Malika",
-"drupal_id": 11163
-}
-],
 "cfa diakhao": [
 {
 "id": "athlete_11164",
@@ -9671,20 +9629,6 @@
 "drupal_id": 11165
 }
 ],
-"gane fafaco": [
-{
-"id": "athlete_11167",
-"nom": "Gane Fafaco",
-"drupal_id": 11167
-}
-],
-"ganefafaco": [
-{
-"id": "athlete_11167",
-"nom": "Gane Fafaco",
-"drupal_id": 11167
-}
-],
 "ama bou yarakh": [
 {
 "id": "athlete_11168",
@@ -9697,20 +9641,6 @@
 "id": "athlete_11168",
 "nom": "Ama Bou Yarakh",
 "drupal_id": 11168
-}
-],
-"sock bou diakhay": [
-{
-"id": "athlete_11169",
-"nom": "Sock Bou Diakhay",
-"drupal_id": 11169
-}
-],
-"sockboudiakhay": [
-{
-"id": "athlete_11169",
-"nom": "Sock Bou Diakhay",
-"drupal_id": 11169
 }
 ],
 "ndiakhass gui": [
@@ -29754,20 +29684,6 @@
 "drupal_id": 20935
 }
 ],
-"teck dieul": [
-{
-"id": "athlete_20939",
-"nom": "Teck Dieul",
-"drupal_id": 20939
-}
-],
-"teckdieul": [
-{
-"id": "athlete_20939",
-"nom": "Teck Dieul",
-"drupal_id": 20939
-}
-],
 "arsenal": [
 {
 "id": "athlete_20947",
@@ -34022,6 +33938,34 @@
 "id": "athlete_22400",
 "nom": "Diaz Ndianda",
 "drupal_id": 22400
+}
+],
+"zoss warang": [
+{
+"id": "athlete_22404",
+"nom": "Zoss Warang",
+"drupal_id": 22404
+}
+],
+"zosswarang": [
+{
+"id": "athlete_22404",
+"nom": "Zoss Warang",
+"drupal_id": 22404
+}
+],
+"nguel dione 2": [
+{
+"id": "athlete_22405",
+"nom": "Nguel Dione 2",
+"drupal_id": 22405
+}
+],
+"ngueldione2": [
+{
+"id": "athlete_22405",
+"nom": "Nguel Dione 2",
+"drupal_id": 22405
 }
 ]
 }
